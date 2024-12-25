@@ -2,10 +2,17 @@
   "name": "chords-thief",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start": "bun run ./index.ts"
+  },
   "devDependencies": {
+    "@types/bun": "^1.1.14",
     "bun-types": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "node-html-parser": "^6.1.13"
   }
 }
