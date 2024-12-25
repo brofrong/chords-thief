@@ -12,9 +12,9 @@ export async function createChordsFolder() {
   await mkdir(`./${FOLDER_NAME}`);
 }
 
-export async function saveChords(chords: ParsedChords) {
+export async function saveChords(chords: ParsedChords, site: string) {
   const filePath = path.join(FOLDER_NAME, `${chords.header}.md`);
-  await writeFile(filePath, mdTemplate(chords));
+  await writeFile(filePath, mdTemplate(chords, site));
 }
 
 export async function updateSitesToParse(success: Set<string>, all: Set<string>) {
@@ -24,11 +24,14 @@ export async function updateSitesToParse(success: Set<string>, all: Set<string>)
 }
 
 
-function mdTemplate(chords: ParsedChords): string {
+function mdTemplate(chords: ParsedChords, site: string): string {
   return `# ${chords.header}
 
 \`\`\`chords
 ${chords.chords}
 \`\`\`
+
+src: [${site}](${site})
+
 `
 };

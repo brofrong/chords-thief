@@ -19,7 +19,7 @@ for (const site of toParse) {
   if (!checkSite(site)) continue;
   const parsedValues = await thiefChordsFromSite(site);
   console.log(`parsed: ${parsedValues.header}`);
-  await saveChords(parsedValues);
+  await saveChords(parsedValues, site);
   successFullParsed.add(site);
 }
 
