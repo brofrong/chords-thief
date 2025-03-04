@@ -1,28 +1,35 @@
-import { readFile } from 'fs/promises';
+import { Telegraf } from 'telegraf';
+import { message } from 'telegraf/filters';
+import { env } from './src/env';
 import { checkSite } from './src/guard';
-import { thiefChordsFromSite } from './src/thief';
-import { createChordsFolder, saveChords, updateSitesToParse } from './src/save-chords';
+import { AVAILABLE_CITES, thiefChordsFromSite } from './src/thief';
+import { saveChords } from './src/save-chords';
 
-export const FOLDER_NAME = 'chords';
 export const FILE_TO_PARSE_NAME = 'sites-to-parse.txt';
 
-await createChordsFolder()
+const bot = new Telegraf(env.TELEGRAM_BOT_TOKEN);
 
-const toParse = (await readFile(`./${FILE_TO_PARSE_NAME}`)).toString().split('\n').filter(it => it.length > 0);
-const successFullParsed = new Set<string>();
+bot.start((ctx) => ctx.reply(`Отправь мне ссылку на один из следующих ресурсов \n ${AVAILABLE_CITES.join('\n')}`));
 
-if (toParse.length === 0) {
-  console.error(`${FILE_TO_PARSE_NAME} is empty`);
+
+bot.on(message('text'), async (ctx) => {
+  const links = ctx.text;
+  for (const site of links.split('\n')) {
+    if (!checkSite(site)) {
+      ctx.reply(`${site} - нельзя обработать`);
+      continue;
+    };
+    const parsedValues = await thiefChordsFromSite(site);
+    ctx.reply(`parsed: ${parsedValues.header}\n${parsedValues.chords}`);
+    await saveChords(parsedValues, site);
+  }
 }
+);
 
-for (const site of toParse) {
-  if (!checkSite(site)) continue;
-  const parsedValues = await thiefChordsFromSite(site);
-  console.log(`parsed: ${parsedValues.header}`);
-  await saveChords(parsedValues, site);
-  successFullParsed.add(site);
-}
 
-console.log(`successfully parsed ${successFullParsed.size}`);
-await updateSitesToParse(successFullParsed, new Set(toParse));
+// Enable graceful stop
+process.once('SIGINT', () => bot.stop('SIGINT'))
+process.once('SIGTERM', () => bot.stop('SIGTERM'))
 
+bot.launch();
+console.log('TELEGRAM BOT STARTED');
