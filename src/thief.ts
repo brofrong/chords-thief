@@ -19,7 +19,9 @@ const parsers: Record<typeof AVAILABLE_CITES[number], Parser> = {
 
 export async function thiefChordsFromSite(site: string) {
   //get HTML
+  console.info('start fetching');
   const response = await fetch(site);
+  console.info('success full fetched');
   const html = await response.text();
   const parsedHTML = parse(html);
 

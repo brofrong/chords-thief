@@ -1,20 +1,27 @@
-import { } from 'fs';
-import { writeFile } from 'fs/promises';
+import * as fs from 'fs/promises';
 import path from 'path';
 import { env } from './env';
 import type { ParsedChords } from './parsers/parce.type';
 
 
-// export async function createChordsFolder() {
-//   if (await exists(`./${FOLDER_NAME}`)) {
-//     return;
-//   }
-//   await mkdir(`./${FOLDER_NAME}`);
-// }
+
+async function pathToSave(fileName: string) {
+  const basicName = path.join(env.PATH_TO_SAVE, `${fileName}`);
+  let name = `${basicName}.md`;
+  let nameTry = 1;
+
+  while ((await fs.exists(name))) {
+    name = basicName + ` (${nameTry}).md`;
+    nameTry++;
+  }
+
+  return name;
+}
 
 export async function saveChords(chords: ParsedChords, site: string) {
-  const filePath = path.join(env.PATH_TO_SAVE, `${chords.header}.md`);
-  await writeFile(filePath, mdTemplate(chords, site));
+  const filePath = await pathToSave(chords.header);
+  console.log(filePath);
+  await fs.writeFile(filePath, mdTemplate(chords, site));
 }
 
 export async function updateSitesToParse(success: Set<string>, all: Set<string>) {

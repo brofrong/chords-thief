@@ -20,8 +20,9 @@ bot.on(message('text'), async (ctx) => {
       continue;
     };
     const parsedValues = await thiefChordsFromSite(site);
-    ctx.reply(`parsed: ${parsedValues.header}\n${parsedValues.chords}`);
+    console.log('test', links);
     await saveChords(parsedValues, site);
+    ctx.reply(`parsed: ${parsedValues.header}\n${parsedValues.chords}`);
   }
 }
 );
