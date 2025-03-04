@@ -2,8 +2,9 @@ import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import { env } from './src/env';
 import { checkSite } from './src/guard';
-import { AVAILABLE_CITES, thiefChordsFromSite } from './src/thief';
 import { saveChords } from './src/save-chords';
+import { AVAILABLE_CITES, thiefChordsFromSite } from './src/thief';
+import { gitPush } from './src/gitpush';
 
 export const FILE_TO_PARSE_NAME = 'sites-to-parse.txt';
 
@@ -20,8 +21,8 @@ bot.on(message('text'), async (ctx) => {
       continue;
     };
     const parsedValues = await thiefChordsFromSite(site);
-    console.log('test', links);
     await saveChords(parsedValues, site);
+    await gitPush(parsedValues.header);
     ctx.reply(`parsed: ${parsedValues.header}\n${parsedValues.chords}`);
   }
 }
@@ -34,3 +35,4 @@ process.once('SIGTERM', () => bot.stop('SIGTERM'))
 
 bot.launch();
 console.log('TELEGRAM BOT STARTED');
+

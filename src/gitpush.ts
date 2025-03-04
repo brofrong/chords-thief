@@ -1,11 +1,6 @@
 import { $ } from 'bun';
 import { env } from './env';
 
-async function gitPush() {
-  await $`cd ${env.PATH_TO_SAVE}`;
-  await $`pwd`;
-  await $`git add .`;
-  await $`git commit -m "saving from bun"`;
-  await $`git push`;
+export async function gitPush(songName: string) {
+  await $`cd ${env.PATH_TO_SAVE} && git add . && git commit -m "add ${songName}" && git push`;
 }
-gitPush();
